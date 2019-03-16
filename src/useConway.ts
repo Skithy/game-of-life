@@ -3,13 +3,47 @@ import produce from 'immer'
 
 import ConwayWorker from 'worker-loader!./conway.worker'
 
-type Coord = [number, number]
+export type Coord = [number, number]
+export type RGB = [number, number, number]
+export type RGBGrid = RGB[][]
+export interface UpdatePayload {
+  grid: RGBGrid
+  options: {
+    loop: boolean
+  }
+}
 
-const init2DGrid = (width: number, height: number) =>
-  [...Array(height)].map(() => Array(width).fill(0))
+export const black: RGB = [0, 0, 0]
+export const white: RGB = [255, 255, 255]
+export const red: RGB = [255, 0, 0]
+export const yellow: RGB = [255, 255, 0]
+export const green: RGB = [0, 255, 0]
+export const cyan: RGB = [0, 255, 255]
+export const blue: RGB = [0, 0, 255]
+export const purple: RGB = [255, 0, 255]
+
+const colours = [white, red, yellow, green, cyan, blue, purple]
+
+export const isEq = (c1: RGB, c2: RGB) => {
+  return c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2]
+}
+
+export const rgbString = ([r, g, b]: RGB) => `rgba(${r}, ${g}, ${b})`
+
+const init2DGrid = (width: number, height: number) => {
+  const arr: RGBGrid = []
+  for (let y = 0; y < height; y++) {
+    const row = []
+    for (let x = 0; x < width; x++) {
+      row.push(black)
+    }
+    arr.push(row)
+  }
+  return arr
+}
 
 const useConway = (width: number, height: number, loop: boolean) => {
-  const [grid, setGrid] = useState<number[][]>(init2DGrid(width, height))
+  const [grid, setGrid] = useState<RGBGrid>(init2DGrid(width, height))
   const conwayWorker = useRef<Worker>()
 
   useEffect(() => {
@@ -28,7 +62,9 @@ const useConway = (width: number, height: number, loop: boolean) => {
   const editCell = (coord: Coord) => {
     const newGrid = produce(grid, draft => {
       const [x, y] = coord
-      draft[y][x] = grid[y][x] === 1 ? 0 : 1
+      const randNum = Math.floor(Math.random() * colours.length)
+      const randColour = colours[randNum]
+      draft[y][x] = isEq(grid[y][x], black) ? randColour : black
     })
 
     setGrid(newGrid)
@@ -36,7 +72,11 @@ const useConway = (width: number, height: number, loop: boolean) => {
 
   const update = () => {
     if (conwayWorker.current) {
-      conwayWorker.current.postMessage({ grid, options: { loop } })
+      const payload: UpdatePayload = {
+        grid,
+        options: { loop },
+      }
+      conwayWorker.current.postMessage(payload)
     }
   }
 

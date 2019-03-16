@@ -1,13 +1,34 @@
-type Coord = [number, number]
-
 const ctx: Worker = self as any
 export default ctx
+
+export type Coord = [number, number]
+export type RGB = [number, number, number]
+export type RGBGrid = RGB[][]
+export interface UpdatePayload {
+  grid: RGBGrid
+  options: {
+    loop: boolean
+  }
+}
+
+export const black: RGB = [0, 0, 0]
+export const isEq = (c1: RGB, c2: RGB) => [0, 1, 2].every(x => c1[x] === c2[x])
+export const avgColour = (colours: RGB[]): RGB => {
+  const avg = (numbers: number[]) =>
+    numbers.reduce((a, b) => a + b) / numbers.length
+
+  return [
+    avg(colours.map(c => c[0])),
+    avg(colours.map(c => c[1])),
+    avg(colours.map(c => c[2])),
+  ]
+}
 
 ctx.addEventListener('message', e => {
   const {
     grid,
     options: { loop },
-  } = e.data
+  } = e.data as UpdatePayload
 
   const width = grid[0].length
   const height = grid.length
@@ -43,17 +64,17 @@ ctx.addEventListener('message', e => {
 
       const aliveNeighbours = getNeighbours([x, y])
         .map(([nX, nY]) => grid[nY][nX])
-        .filter(o => o === 1).length
+        .filter(o => !isEq(o, black))
 
-      if (status === 0) {
+      if (isEq(status, black)) {
         // Reproduction
-        if (aliveNeighbours === 3) {
-          newGrid[y][x] = 1
+        if (aliveNeighbours.length === 3) {
+          newGrid[y][x] = avgColour(aliveNeighbours)
         }
       } else {
         // Underpopulation or overpopulation
-        if (aliveNeighbours < 2 || aliveNeighbours > 3) {
-          newGrid[y][x] = 0
+        if (aliveNeighbours.length < 2 || aliveNeighbours.length > 3) {
+          newGrid[y][x] = black
         }
       }
     }

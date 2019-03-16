@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import './App.css'
-import useConway from './useConway'
+import useConway, { rgbString } from './useConway'
 import useInterval from './useInterval'
 
 const WIDTH = 40
@@ -34,7 +34,7 @@ const App: React.FC = () => {
             <div
               key={y * WIDTH + x}
               className='cell'
-              style={{ backgroundColor: cell ? 'white' : 'black' }}
+              style={{ backgroundColor: rgbString(cell) }}
               onClick={editCell.bind(null, [x, y])}
             />
           ))}
