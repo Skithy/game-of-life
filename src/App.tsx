@@ -23,7 +23,6 @@ const App: React.FC = () => {
     })
 
     conwayWorker.current.addEventListener('message', ev => {
-      console.log('eve')
       setGrid(ev.data)
     })
 
@@ -48,13 +47,21 @@ const App: React.FC = () => {
   }
 
   const startInterval = () => {
-    conwayWorker.current.postMessage({ type: 'startInterval', payload: speed })
     setStarted(true)
+    conwayWorker.current.postMessage({ type: 'startInterval', payload: speed })
   }
 
   const endInterval = () => {
-    conwayWorker.current.postMessage({ type: 'stopInterval' })
     setStarted(false)
+    conwayWorker.current.postMessage({ type: 'stopInterval' })
+  }
+
+  const changeIntervalSpeed = (newSpeed: number) => {
+    setSpeed(newSpeed)
+    conwayWorker.current.postMessage({
+      type: 'changeIntervalSpeed',
+      payload: newSpeed,
+    })
   }
 
   if (!grid) {
@@ -80,16 +87,15 @@ const App: React.FC = () => {
       ) : (
         <button onClick={startInterval}>START</button>
       )}
-
       <button onClick={update}>STEP</button>
       <button onClick={reset}>RESET</button>
-
+      Speed: {speed}
       <input
         type='range'
         min='50'
         max='1000'
         value={speed}
-        onChange={e => setSpeed(parseInt(e.target.value, 10))}
+        onChange={e => changeIntervalSpeed(parseInt(e.target.value, 10))}
       />
     </div>
   )

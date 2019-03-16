@@ -10,7 +10,7 @@ let width = 0
 let height = 0
 let loop = false
 let changedSet = new Set<number>()
-let interval: NodeJS.Timeout
+let interval: NodeJS.Timeout | undefined
 
 ctx.addEventListener('message', e => {
   switch (e.data.type) {
@@ -54,7 +54,21 @@ ctx.addEventListener('message', e => {
     }
 
     case 'stopInterval': {
-      clearInterval(interval)
+      if (interval) {
+        clearInterval(interval)
+        interval = undefined
+      }
+
+      return
+    }
+
+    case 'changeIntervalSpeed': {
+      if (interval) {
+        const speed = e.data.payload
+        clearInterval(interval)
+        interval = setInterval(update, speed)
+      }
+
       return
     }
   }
