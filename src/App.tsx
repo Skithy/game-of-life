@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 
-import ConwayWorker from 'worker-loader!./conway.worker'
 import './App.css'
+import useConway from './useConway'
+import useInterval from './useInterval'
 
 const WIDTH = 40
 const HEIGHT = 20
@@ -9,59 +10,16 @@ const HEIGHT = 20
 const App: React.FC = () => {
   const [started, setStarted] = useState(false)
   const [speed, setSpeed] = useState(200)
-  const [grid, setGrid] = useState<number[][]>()
-  const conwayWorker = useRef(new ConwayWorker())
+  const { grid, editCell, update, reset } = useConway(WIDTH, HEIGHT, true)
 
-  useEffect(() => {
-    conwayWorker.current.postMessage({
-      type: 'init',
-      payload: {
-        width: WIDTH,
-        height: HEIGHT,
-        loop: true,
-      },
-    })
-
-    conwayWorker.current.addEventListener('message', ev => {
-      setGrid(ev.data)
-    })
-
-    return () => {
-      conwayWorker.current.terminate()
-    }
-  }, [])
-
-  const editCell = (x: number, y: number) => {
-    conwayWorker.current.postMessage({
-      type: 'editCell',
-      payload: [x, y],
-    })
-  }
-
-  const update = () => {
-    conwayWorker.current.postMessage({ type: 'update' })
-  }
-
-  const reset = () => {
-    conwayWorker.current.postMessage({ type: 'reset' })
-  }
+  useInterval(update, started ? speed : 0)
 
   const startInterval = () => {
     setStarted(true)
-    conwayWorker.current.postMessage({ type: 'startInterval', payload: speed })
   }
 
   const endInterval = () => {
     setStarted(false)
-    conwayWorker.current.postMessage({ type: 'stopInterval' })
-  }
-
-  const changeIntervalSpeed = (newSpeed: number) => {
-    setSpeed(newSpeed)
-    conwayWorker.current.postMessage({
-      type: 'changeIntervalSpeed',
-      payload: newSpeed,
-    })
   }
 
   if (!grid) {
@@ -77,7 +35,7 @@ const App: React.FC = () => {
               key={y * WIDTH + x}
               className='cell'
               style={{ backgroundColor: cell ? 'white' : 'black' }}
-              onClick={editCell.bind(null, x, y)}
+              onClick={editCell.bind(null, [x, y])}
             />
           ))}
         </div>
@@ -92,10 +50,10 @@ const App: React.FC = () => {
       Speed: {speed}
       <input
         type='range'
-        min='50'
+        min='10'
         max='1000'
         value={speed}
-        onChange={e => changeIntervalSpeed(parseInt(e.target.value, 10))}
+        onChange={e => setSpeed(parseInt(e.target.value, 10))}
       />
     </div>
   )
