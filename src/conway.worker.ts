@@ -69,7 +69,17 @@ ctx.addEventListener('message', e => {
       if (isEq(status, black)) {
         // Reproduction
         if (aliveNeighbours.length === 3) {
-          newGrid[y][x] = avgColour(aliveNeighbours)
+          // get avg of all neighbours
+          // newGrid[y][x] = avgColour(aliveNeighbours)
+
+          // get 2 random neighours and av colour
+          const parents = aliveNeighbours
+            .sort(() => 0.5 - Math.random()) // Shuffle array
+            .slice(0, 2)
+          newGrid[y][x] = avgColour(parents)
+          // choose colour of random neighbour
+          // const randomIndex = Math.floor(Math.random() * avgColour.length)
+          // newGrid[y][x] = aliveNeighbours[randomIndex]
         }
       } else {
         // Underpopulation or overpopulation
