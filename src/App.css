@@ -46,10 +46,6 @@
   display: inline-block;
 }
 
-.cell:hover {
-  border: 1px solid gray;
-}
-
 .fade {
   transition: background-color 0.5s;
 }

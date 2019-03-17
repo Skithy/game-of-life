@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import classnames from 'classnames'
 
 import './App.css'
-import useConway from './useConway'
+import useConway, { Coord } from './useConway'
 import useInterval from './useInterval'
 import Grid from './Grid'
 import { colours, rgbString, RGB, white, isEq } from './colours'
@@ -16,7 +16,8 @@ const App: React.FC = () => {
   const [fade, setFade] = useState(true)
   const [showGrid, setShowGrid] = useState(false)
   const [loop, setLoop] = useState(true)
-  const [colour, setColour] = useState<RGB>(white)
+  const [selectedColour, setSelectedColour] = useState<RGB>(white)
+  const [selectedCells, setSelectedCells] = useState<Coord[]>([])
   const { grid, editCell, update, reset } = useConway(WIDTH, HEIGHT)
 
   useInterval(
@@ -30,6 +31,14 @@ const App: React.FC = () => {
     return <div>Loading...</div>
   }
 
+  const handleCellHover = (coord: Coord) => {
+    setSelectedCells([coord])
+  }
+
+  const handleCellLeave = () => {
+    setSelectedCells([])
+  }
+
   return (
     <main className='App'>
       <Grid
@@ -37,7 +46,11 @@ const App: React.FC = () => {
         grid={grid}
         fade={fade}
         showGrid={showGrid}
-        editCell={coord => editCell(colour, coord)}
+        selectedCells={selectedCells}
+        selectedColour={selectedColour}
+        editCell={coord => editCell(selectedColour, coord)}
+        handleCellHover={handleCellHover}
+        handleCellLeave={handleCellLeave}
       />
 
       <div className='settings'>
@@ -107,10 +120,10 @@ const App: React.FC = () => {
               <span
                 key={c.toString()}
                 className={classnames('cell-select', {
-                  'cell-selected': isEq(colour, c),
+                  'cell-selected': isEq(selectedColour, c),
                 })}
                 style={{ backgroundColor: rgbString(c) }}
-                onClick={() => setColour(c)}
+                onClick={() => setSelectedColour(c)}
               />
             ))}
           </div>
