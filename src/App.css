@@ -1,9 +1,31 @@
+.grid {
+  max-width: 500px;
+  max-height: 300px;
+  overflow-x: scroll;
+}
+
 .row {
-  display: flex;
+  white-space: nowrap;
+  height: 2em;
 }
 
 .cell {
   height: 2em;
   width: 2em;
   cursor: pointer;
+  transition: 0ms;
+  box-sizing: border-box;
+  display: inline-block;
+}
+
+.cell:hover {
+  border: 1px solid gray;
+}
+
+.fade {
+  transition: background-color 0.5s;
+}
+
+.border {
+  border: 1px solid darkslategray;
 }

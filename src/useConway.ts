@@ -27,8 +27,12 @@ const colours = [white, red, yellow, green, cyan, blue, purple]
 export const isEq = (c1: RGB, c2: RGB) => {
   return c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2]
 }
+export const isBlack = (colour: RGB) => {
+  return isEq(colour, black)
+}
 
-export const rgbString = ([r, g, b]: RGB) => `rgba(${r}, ${g}, ${b})`
+export const rgbString = ([r, g, b]: RGB, a?: number) =>
+  a ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgb(${r}, ${g}, ${b})`
 
 const init2DGrid = (width: number, height: number) => {
   const arr: RGBGrid = []
@@ -60,14 +64,14 @@ const useConway = (width: number, height: number, loop: boolean) => {
   }, [])
 
   const editCell = (coord: Coord) => {
-    const newGrid = produce(grid, draft => {
-      const [x, y] = coord
-      const randNum = Math.floor(Math.random() * colours.length)
-      const randColour = colours[randNum]
-      draft[y][x] = isEq(grid[y][x], black) ? randColour : black
+    setGrid(currentGrid => {
+      return produce(currentGrid, draft => {
+        const [x, y] = coord
+        const randNum = Math.floor(Math.random() * colours.length)
+        const randColour = colours[randNum]
+        draft[y][x] = isBlack(grid[y][x]) ? randColour : black
+      })
     })
-
-    setGrid(newGrid)
   }
 
   const update = () => {

@@ -1,19 +1,19 @@
 const ctx: Worker = self as any
 export default ctx
 
-export type Coord = [number, number]
-export type RGB = [number, number, number]
-export type RGBGrid = RGB[][]
-export interface UpdatePayload {
+type Coord = [number, number]
+type RGB = [number, number, number]
+type RGBGrid = RGB[][]
+interface UpdatePayload {
   grid: RGBGrid
   options: {
     loop: boolean
   }
 }
 
-export const black: RGB = [0, 0, 0]
-export const isEq = (c1: RGB, c2: RGB) => [0, 1, 2].every(x => c1[x] === c2[x])
-export const avgColour = (colours: RGB[]): RGB => {
+const black: RGB = [0, 0, 0]
+const isEq = (c1: RGB, c2: RGB) => [0, 1, 2].every(x => c1[x] === c2[x])
+const avgColour = (colours: RGB[]): RGB => {
   const avg = (numbers: number[]) =>
     numbers.reduce((a, b) => a + b) / numbers.length
 
