@@ -6,6 +6,7 @@ import useConway, { Coord } from './useConway'
 import useInterval from './useInterval'
 import Grid from './Grid'
 import { colours, rgbString, RGB, white, isEq } from './colours'
+import { IStamp, stamps, stampToCoords } from './stamps'
 
 const WIDTH = 40
 const HEIGHT = 22
@@ -18,6 +19,7 @@ const App: React.FC = () => {
   const [loop, setLoop] = useState(true)
   const [selectedColour, setSelectedColour] = useState<RGB>(white)
   const [selectedCells, setSelectedCells] = useState<Coord[]>([])
+  const [selectedStamp, setSelectedStamp] = useState<IStamp>(stamps[0])
   const { grid, editCell, update, reset } = useConway(WIDTH, HEIGHT)
 
   useInterval(
@@ -31,8 +33,21 @@ const App: React.FC = () => {
     return <div>Loading...</div>
   }
 
-  const handleCellHover = (coord: Coord) => {
-    setSelectedCells([coord])
+  const handleCellHover = ([x, y]: Coord) => {
+    const newSelectedCells = stampToCoords(selectedStamp).map(([nX, nY]) => {
+      let newX = x + nX
+      let newY = y + nY
+
+      if (loop) {
+        if (newX < 0) newX += WIDTH
+        if (newX >= WIDTH) newX -= WIDTH
+        if (newY < 0) newY += HEIGHT
+        if (newY >= HEIGHT) newY -= HEIGHT
+      }
+
+      return [newX, newY] as Coord
+    })
+    setSelectedCells(newSelectedCells)
   }
 
   const handleCellLeave = () => {
@@ -48,7 +63,7 @@ const App: React.FC = () => {
         showGrid={showGrid}
         selectedCells={selectedCells}
         selectedColour={selectedColour}
-        editCell={coord => editCell(selectedColour, coord)}
+        editCell={() => editCell(selectedColour, selectedCells)}
         handleCellHover={handleCellHover}
         handleCellLeave={handleCellLeave}
       />
@@ -114,7 +129,7 @@ const App: React.FC = () => {
           </label>
         </section>
         <section className='settings-row'>
-          <label>Colour select</label>
+          <label className='select-label'>Colour select</label>
           <div className='colour-select'>
             {colours.map(c => (
               <span
@@ -125,6 +140,23 @@ const App: React.FC = () => {
                 style={{ backgroundColor: rgbString(c) }}
                 onClick={() => setSelectedColour(c)}
               />
+            ))}
+          </div>
+        </section>
+        <section className='settings-row'>
+          <label className='select-label'>Stamp select</label>
+          <div className='colour-select'>
+            {stamps.map(s => (
+              <button
+                key={s.name}
+                className={classnames('pure-button', {
+                  'button-secondary': s === selectedStamp,
+                  'pure-button-active': s === selectedStamp,
+                })}
+                onClick={() => setSelectedStamp(s)}
+              >
+                {s.name}
+              </button>
             ))}
           </div>
         </section>

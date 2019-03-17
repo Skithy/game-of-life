@@ -12,7 +12,7 @@ export const purple: RGB = [255, 0, 255]
 export const colours = [white, red, yellow, green, cyan, blue, purple]
 
 export const isEq = (c1: RGB, c2: RGB) => {
-  return c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2]
+  return c1 && c2 && c1[0] === c2[0] && c1[1] === c2[1] && c1[2] === c2[2]
 }
 export const isBlack = (colour: RGB) => {
   return isEq(colour, black)

@@ -110,3 +110,7 @@
 .cell-selected {
   border: 3px dashed black;
 }
+
+.select-label {
+  margin-right: 0.5em;
+}

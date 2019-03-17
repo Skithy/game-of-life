@@ -42,11 +42,15 @@ const useConway = (width: number, height: number) => {
     }
   }, [])
 
-  const editCell = (colour: RGB, coord: Coord) => {
+  const editCell = (colour: RGB, coords: Coord[]) => {
     setGrid(currentGrid => {
       return produce(currentGrid, draft => {
-        const [x, y] = coord
-        draft[y][x] = isEq(grid[y][x], colour) ? black : colour
+        coords.forEach(coord => {
+          const [x, y] = coord
+          if (draft[y][x]) {
+            draft[y][x] = isEq(grid[y][x], colour) ? black : colour
+          }
+        })
       })
     })
   }
