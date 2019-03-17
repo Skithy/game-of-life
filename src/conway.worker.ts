@@ -1,27 +1,15 @@
+import { RGB, avgColour, isEq, black } from './colours'
+
 const ctx: Worker = self as any
 export default ctx
 
 type Coord = [number, number]
-type RGB = [number, number, number]
 type RGBGrid = RGB[][]
 interface UpdatePayload {
   grid: RGBGrid
   options: {
     loop: boolean
   }
-}
-
-const black: RGB = [0, 0, 0]
-const isEq = (c1: RGB, c2: RGB) => [0, 1, 2].every(x => c1[x] === c2[x])
-const avgColour = (colours: RGB[]): RGB => {
-  const avg = (numbers: number[]) =>
-    numbers.reduce((a, b) => a + b) / numbers.length
-
-  return [
-    avg(colours.map(c => c[0])),
-    avg(colours.map(c => c[1])),
-    avg(colours.map(c => c[2])),
-  ]
 }
 
 ctx.addEventListener('message', e => {
